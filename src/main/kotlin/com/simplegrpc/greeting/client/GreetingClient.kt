@@ -3,13 +3,13 @@ package com.simplegrpc.greeting.client
 import com.proto.greet.GreetRequest
 import com.proto.greet.GreetServiceGrpcKt
 import com.proto.greet.Greeting
-import com.proto.simple.SimpleServiceGrpcKt
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
 import java.io.Closeable
 import java.util.concurrent.TimeUnit
 
-class GreetingClient(private val channel: ManagedChannel) : Closeable {
+class GreetingClient(private val channel: ManagedChannel) :
+        Closeable {
     private val greetStub: GreetServiceGrpcKt.GreetServiceCoroutineStub by lazy {
         GreetServiceGrpcKt.GreetServiceCoroutineStub(channel)
     }
@@ -51,5 +51,6 @@ suspend fun main(args:Array<String>){
     println("Call greet()")
     client.greet()
 
+    println("Close channel")
     client.close()
 }
