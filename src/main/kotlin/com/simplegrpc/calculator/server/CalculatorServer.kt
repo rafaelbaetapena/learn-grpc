@@ -6,6 +6,7 @@ import io.grpc.ServerBuilder
 class CalculatorServer(private val port: Int) {
     val server: Server = ServerBuilder
             .forPort(port)
+            .addService(CalculatorServiceImpl())
             .build()
 
     fun start(){
