@@ -1,10 +1,12 @@
 package com.simplegrpc.greeting.client
 
+import com.proto.greet.GreetManyTimesRequest
 import com.proto.greet.GreetRequest
 import com.proto.greet.GreetServiceGrpcKt
 import com.proto.greet.Greeting
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
+import kotlinx.coroutines.flow.collect
 import java.io.Closeable
 import java.util.concurrent.TimeUnit
 
@@ -29,6 +31,20 @@ class GreetingClient(private val channel: ManagedChannel) :
         println("Received: ${greetResponse.result}")
     }
 
+    suspend fun greetManyTimes(){
+        val greeting = Greeting.newBuilder()
+            .setFirstName("Rafael")
+            .setLastName("Pena")
+            .build()
+
+        val greetManyTimesRequest = GreetManyTimesRequest.newBuilder()
+            .setGreeting(greeting)
+            .build()
+
+        greetStub.greetManyTimes(greetManyTimesRequest)
+            .collect {greetManyTimesResponse -> println("Received: ${greetManyTimesResponse.result}")}
+    }
+
     override fun close() {
         println("Shutting down channel")
         channel.shutdown()
@@ -50,6 +66,9 @@ suspend fun main(args:Array<String>){
 
     println("Call greet()")
     client.greet()
+
+    println("Call greetManyTimes()")
+    client.greetManyTimes()
 
     println("Close channel")
     client.close()
