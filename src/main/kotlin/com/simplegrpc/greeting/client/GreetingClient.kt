@@ -1,5 +1,8 @@
 package com.simplegrpc.greeting.client
 
+import com.proto.greet.GreetRequest
+import com.proto.greet.GreetServiceGrpcKt
+import com.proto.greet.Greeting
 import com.proto.simple.SimpleServiceGrpcKt
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
@@ -7,8 +10,23 @@ import java.io.Closeable
 import java.util.concurrent.TimeUnit
 
 class GreetingClient(private val channel: ManagedChannel) : Closeable {
-    private val simpleStub: SimpleServiceGrpcKt.SimpleServiceCoroutineStub by lazy {
-        SimpleServiceGrpcKt.SimpleServiceCoroutineStub(channel)
+    private val greetStub: GreetServiceGrpcKt.GreetServiceCoroutineStub by lazy {
+        GreetServiceGrpcKt.GreetServiceCoroutineStub(channel)
+    }
+
+    suspend fun greet(){
+        val greeting = Greeting.newBuilder()
+                .setFirstName("Rafael")
+                .setLastName("Pena")
+                .build()
+
+        val greetRequest = GreetRequest.newBuilder()
+                .setGreeting(greeting)
+                .build()
+
+        val greetResponse = greetStub.greet(greetRequest)
+
+        println("Received: ${greetResponse.result}")
     }
 
     override fun close() {
@@ -18,7 +36,7 @@ class GreetingClient(private val channel: ManagedChannel) : Closeable {
     }
 }
 
-fun main(args:Array<String>){
+suspend fun main(args:Array<String>){
     println("Hello I'm a gRPC client")
 
     val port = 50051
@@ -30,5 +48,8 @@ fun main(args:Array<String>){
     println("Creating Stub")
     val client = GreetingClient(channel)
 
-    client.close();
+    println("Call greet()")
+    client.greet()
+
+    client.close()
 }
