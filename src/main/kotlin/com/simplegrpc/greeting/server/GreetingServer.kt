@@ -6,6 +6,7 @@ import io.grpc.ServerBuilder
 class GreetingServer(private val port: Int) {
     val server: Server = ServerBuilder
         .forPort(port)
+        .addService(GreetServiceImpl())
         .build()
 
     fun start(){
